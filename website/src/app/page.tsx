@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -51,7 +51,7 @@ export default function Home() {
               </div>
               <div className="flex-1 min-w-[300px]">
                 <p className="text-muted-foreground mb-4">No build tools needed!</p>
-                <div className="bg-[#F5F5F5] rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                <div className="bg-[#272931] rounded-lg p-4 font-mono text-sm overflow-x-auto">
                   <code>
                     <span className="text-muted-foreground">import </span>
                     <span className="text-foreground">velo </span>
@@ -79,7 +79,7 @@ export default function Home() {
           <div className="space-y-6 max-w-3xl">
             <div>
               <h3 className="font-semibold mb-2">1. Import</h3>
-              <div className="bg-[#F5F5F5] rounded-lg p-4 font-mono text-sm overflow-x-auto">
+              <div className="bg-[#272931] rounded-lg p-4 font-mono text-sm overflow-x-auto">
                 <code>
                   <span className="text-muted-foreground">import </span>
                   <span className="text-foreground">velo </span>
@@ -91,7 +91,7 @@ export default function Home() {
 
             <div>
               <h3 className="font-semibold mb-2">2. Configure</h3>
-              <div className="bg-[#F5F5F5] rounded-lg p-4 font-mono text-sm overflow-x-auto">
+              <div className="bg-[#272931] rounded-lg p-4 font-mono text-sm overflow-x-auto">
                 <pre>{`server:
   port: 8080
 
@@ -114,7 +114,7 @@ auth:
 
             <div>
               <h3 className="font-semibold mb-2">3. Run</h3>
-              <div className="bg-[#F5F5F5] rounded-lg p-4 font-mono text-sm overflow-x-auto">
+              <div className="bg-[#272931] rounded-lg p-4 font-mono text-sm overflow-x-auto">
                 <code>
                   <span className="text-foreground">./velo</span>
                   <span className="text-muted-foreground"> --config velo.yaml</span>
