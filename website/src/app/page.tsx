@@ -10,7 +10,9 @@ export default function Home() {
             Velo
           </Link>
           <nav className="flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#features" className="hover:text-foreground transition">Features</a>
+            <a href="#docs" className="hover:text-foreground transition">Docs</a>
+            <a href="#tests" className="hover:text-foreground transition">Tests</a>
+            <a href="#compare" className="hover:text-foreground transition">Compare</a>
             <a href="https://github.com/MTconnect-BR/APIs" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition">
               GitHub
             </a>
@@ -19,8 +21,8 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="flex flex-col justify-center items-start w-full h-screen min-h-[680px] px-[5%]">
-        <div>
+      <section className="flex flex-col justify-center items-center w-full h-screen min-h-[680px] px-[5%]">
+        <div className="text-center">
           <h1 className="text-[65px] md:text-[105px] font-bold uppercase leading-none tracking-tight">
             FAST
           </h1>
@@ -67,10 +69,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How to Use */}
-      <section id="features" className="py-24 px-6">
+      {/* Documentation */}
+      <section id="docs" className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">How to Use</h2>
+          <h2 className="text-3xl font-bold mb-4">Documentation</h2>
           <p className="text-muted-foreground mb-8">Get started with Velo in minutes.</p>
 
           <div className="space-y-6 max-w-3xl">
@@ -118,6 +120,169 @@ auth:
                 </code>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tests */}
+      <section id="tests" className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4">Tests</h2>
+          <p className="text-muted-foreground mb-8">Performance benchmarks.</p>
+
+          <div className="max-w-3xl space-y-8">
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">Latency</span>
+                <div className="text-sm">
+                  <span className="text-muted-foreground">45ms</span>
+                  <span className="mx-2">→</span>
+                  <span className="text-primary font-medium">12ms</span>
+                </div>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-primary rounded-full" style={{ width: "27%" }} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">Throughput</span>
+                <div className="text-sm">
+                  <span className="text-muted-foreground">1k req/s</span>
+                  <span className="mx-2">→</span>
+                  <span className="text-primary font-medium">50k req/s</span>
+                </div>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-primary rounded-full" style={{ width: "100%" }} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">Memory</span>
+                <div className="text-sm">
+                  <span className="text-muted-foreground">256 MB</span>
+                  <span className="mx-2">→</span>
+                  <span className="text-primary font-medium">45 MB</span>
+                </div>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-primary rounded-full" style={{ width: "18%" }} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">Cold Start</span>
+                <div className="text-sm">
+                  <span className="text-muted-foreground">2.5s</span>
+                  <span className="mx-2">→</span>
+                  <span className="text-primary font-medium">15ms</span>
+                </div>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-primary rounded-full" style={{ width: "1%" }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparisons */}
+      <section id="compare" className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4">Compare</h2>
+          <p className="text-muted-foreground mb-8">Velo vs traditional API gateways used by AI companies.</p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Feature</th>
+                  <th className="text-left py-3 px-4 font-medium text-primary">Velo</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">OpenAI</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Anthropic</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">GitHub</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Gemini</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-border">
+                  <td className="py-3 px-4">Self-hosted</td>
+                  <td className="py-3 px-4 text-primary">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-3 px-4">Open Source</td>
+                  <td className="py-3 px-4 text-primary">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-3 px-4">Rate Limiting</td>
+                  <td className="py-3 px-4 text-primary">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✓</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-3 px-4">Cache</td>
+                  <td className="py-3 px-4 text-primary">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-3 px-4">Auth (JWT/OAuth2)</td>
+                  <td className="py-3 px-4 text-primary">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">API Key</td>
+                  <td className="py-3 px-4 text-muted-foreground">API Key</td>
+                  <td className="py-3 px-4 text-muted-foreground">OAuth</td>
+                  <td className="py-3 px-4 text-muted-foreground">API Key</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-3 px-4">Load Balancing</td>
+                  <td className="py-3 px-4 text-primary">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                  <td className="py-3 px-4 text-muted-foreground">✗</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-3 px-4">Observability</td>
+                  <td className="py-3 px-4 text-primary">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">Dashboard</td>
+                  <td className="py-3 px-4 text-muted-foreground">Dashboard</td>
+                  <td className="py-3 px-4 text-muted-foreground">Logs</td>
+                  <td className="py-3 px-4 text-muted-foreground">Dashboard</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-3 px-4">Auto Docs (OpenAPI)</td>
+                  <td className="py-3 px-4 text-primary">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✓</td>
+                  <td className="py-3 px-4 text-muted-foreground">✓</td>
+                </tr>
+                <tr>
+                  <td className="py-3 px-4">Cost</td>
+                  <td className="py-3 px-4 text-primary font-medium">Free</td>
+                  <td className="py-3 px-4 text-muted-foreground">Pay per call</td>
+                  <td className="py-3 px-4 text-muted-foreground">Pay per call</td>
+                  <td className="py-3 px-4 text-muted-foreground">Pay per call</td>
+                  <td className="py-3 px-4 text-muted-foreground">Pay per call</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
