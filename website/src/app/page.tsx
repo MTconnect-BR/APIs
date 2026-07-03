@@ -14,7 +14,6 @@ export default function Home() {
           </Link>
           <nav className="flex items-center gap-6 text-sm text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition">Features</a>
-            <a href="#benchmark" className="hover:text-foreground transition">Benchmark</a>
             <a href="https://github.com/MTconnect-BR/APIs" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition">
               GitHub
             </a>
@@ -71,38 +70,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* How to Use */}
       <section id="features" className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">7 problems every API faces</h2>
-          <p className="text-center text-muted-foreground mb-16">Velo solves them all.</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <FeatureCard icon="⚡" title="Rate Limiting" description="Token bucket + sliding window" />
-            <FeatureCard icon="📦" title="Cache" description="Redis-backed with TTL" />
-            <FeatureCard icon="🔐" title="Auth" description="JWT + OAuth2 + API keys" />
-            <FeatureCard icon="⚖️" title="Load Balancing" description="Round-robin, least connections" />
-            <FeatureCard icon="📊" title="Observability" description="Prometheus + structured logs" />
-            <FeatureCard icon="📝" title="Docs" description="Auto OpenAPI 3.1" />
-            <FeatureCard icon="🏷️" title="Versioning" description="Header + path + query" />
-          </div>
-        </div>
-      </section>
+          <h2 className="text-3xl font-bold mb-4">How to Use</h2>
+          <p className="text-muted-foreground mb-8">Get started with Velo in minutes.</p>
 
-      {/* Code Example */}
-      <section className="py-24 px-6 bg-[#F9F9F9]">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Simple configuration</h2>
-          <p className="text-center text-muted-foreground mb-16">One YAML file. That&apos;s it.</p>
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white border border-border rounded-lg overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
-                <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-                <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-                <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
-                <span className="ml-2 text-sm text-muted-foreground">velo.yaml</span>
+          <div className="space-y-6 max-w-3xl">
+            <div>
+              <h3 className="font-semibold mb-2">1. Import</h3>
+              <div className="bg-[#F5F5F5] rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                <code>
+                  <span className="text-muted-foreground">import </span>
+                  <span className="text-foreground">velo </span>
+                  <span className="text-muted-foreground">from </span>
+                  <span className="text-primary">&quot;https://velo.sh/velo@latest&quot;</span>
+                </code>
               </div>
-              <pre className="p-6 text-sm overflow-x-auto">
-{`server:
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">2. Configure</h3>
+              <div className="bg-[#F5F5F5] rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                <pre>{`server:
   port: 8080
 
 ratelimit:
@@ -118,41 +108,19 @@ auth:
   enabled: true
   providers:
     - type: jwt
-      secret: "\${JWT_SECRET}"`}
-              </pre>
+      secret: "\${JWT_SECRET}"`}</pre>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Benchmark */}
-      <section id="benchmark" className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Performance</h2>
-          <p className="text-center text-muted-foreground mb-16">Traditional API vs Velo Gateway</p>
-          <div className="max-w-2xl mx-auto space-y-8">
-            <BenchmarkRow label="Latência" traditional="45ms" velo="12ms" percent={27} />
-            <BenchmarkRow label="Throughput" traditional="1k req/s" velo="50k req/s" percent={100} />
-            <BenchmarkRow label="Memória" traditional="256 MB" velo="45 MB" percent={18} />
-            <BenchmarkRow label="Cold Start" traditional="2.5s" velo="15ms" percent={1} />
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-24 px-6 bg-[#F9F9F9]">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to accelerate?</h2>
-          <p className="text-muted-foreground mb-10">
-            Deploy in minutes. Single binary. Zero dependencies.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <a href="https://github.com/MTconnect-BR/APIs" target="_blank" rel="noopener noreferrer" className="bg-primary text-white px-8 py-3 rounded-lg font-medium hover:bg-primary/90 transition">
-              Get Started
-            </a>
-            <a href="https://github.com/MTconnect-BR/APIs" target="_blank" rel="noopener noreferrer" className="border border-border px-8 py-3 rounded-lg font-medium hover:bg-muted transition">
-              View on GitHub
-            </a>
+            <div>
+              <h3 className="font-semibold mb-2">3. Run</h3>
+              <div className="bg-[#F5F5F5] rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                <code>
+                  <span className="text-foreground">./velo</span>
+                  <span className="text-muted-foreground"> --config velo.yaml</span>
+                </code>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -160,7 +128,7 @@ auth:
       {/* Footer */}
       <footer className="py-8 px-6 border-t border-border">
         <div className="max-w-5xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
-          <span>© 2024 Velo API</span>
+          <span>&copy; 2024 Velo API</span>
           <div className="flex gap-6">
             <a href="https://github.com/MTconnect-BR/APIs" className="hover:text-foreground transition">GitHub</a>
             <span>MIT License</span>
@@ -168,33 +136,5 @@ auth:
         </div>
       </footer>
     </main>
-  );
-}
-
-function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
-  return (
-    <div className="border border-border rounded-lg p-4 hover:shadow-sm transition">
-      <div className="text-2xl mb-2">{icon}</div>
-      <h3 className="font-semibold text-sm">{title}</h3>
-      <p className="text-xs text-muted-foreground">{description}</p>
-    </div>
-  );
-}
-
-function BenchmarkRow({ label, traditional, velo, percent }: { label: string; traditional: string; velo: string; percent: number }) {
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-2">
-        <span className="font-medium">{label}</span>
-        <div className="text-sm">
-          <span className="text-muted-foreground">{traditional}</span>
-          <span className="mx-2">→</span>
-          <span className="text-primary font-medium">{velo}</span>
-        </div>
-      </div>
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
-        <div className="h-full bg-primary rounded-full" style={{ width: `${percent}%` }} />
-      </div>
-    </div>
   );
 }
