@@ -16,7 +16,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 
 COPY --from=builder /app/velo .
-COPY --from=builder /app/configs/velo.example.yaml ./configs/velo.yaml
+COPY --from=builder /app/configs/velo.production.yaml ./configs/velo.yaml
 
 EXPOSE 8080
 

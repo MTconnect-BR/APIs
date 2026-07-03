@@ -1,0 +1,44 @@
+server:
+  host: 0.0.0.0
+  port: 8080
+
+ratelimit:
+  enabled: true
+  default: "1000/min"
+  rules:
+    - path: "/api/v1/*"
+      limit: "5000/min"
+    - path: "/api/v2/*"
+      limit: "2500/min"
+
+cache:
+  enabled: true
+  driver: memory
+  ttl: 5m
+
+auth:
+  enabled: false
+
+loadbalancer:
+  enabled: false
+
+observe:
+  metrics:
+    enabled: true
+    path: /metrics
+  logs:
+    level: info
+    format: json
+  tracing:
+    enabled: false
+
+docs:
+  enabled: true
+  path: /docs
+  title: "Velo API Gateway"
+  version: "1.0.0"
+
+versioning:
+  strategy: header
+  header: "X-API-Version"
+  default: "v1"

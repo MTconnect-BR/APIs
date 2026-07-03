@@ -15,10 +15,11 @@ type RateLimiter struct {
 }
 
 type TokenBucket struct {
-	tokens    float64
-	maxTokens float64
+	tokens     float64
+	maxTokens  float64
 	refillRate float64
 	lastRefill time.Time
+	mu         sync.Mutex
 }
 
 func New(cfg config.RateLimitConfig) *RateLimiter {
@@ -68,6 +69,8 @@ func (rl *RateLimiter) getBucket(key string) *TokenBucket {
 }
 
 func (b *TokenBucket) Allow() bool {
+	b.mu.Lock()
+	defer b.mu.Unlock()
 	b.refill()
 	if b.tokens >= 1 {
 		b.tokens--

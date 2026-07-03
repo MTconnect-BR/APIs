@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/velo-api/velo/pkg/config"
 )
@@ -101,5 +102,6 @@ func (lb *LoadBalancer) healthCheck() {
 			}
 		}
 		lb.mu.Unlock()
+		time.Sleep(10 * time.Second)
 	}
 }
