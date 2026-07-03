@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-import { TooltipProvider } from "@/components/ui/tooltip";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
-  title: "Velo - API Gateway",
-  description: "High-performance API gateway for modern applications",
+  title: "Velo - Fast, Smart, Global API Gateway",
+  description: "A high-performance API gateway for modern applications. Rate limiting, cache, auth, load balancing, observability, docs, and versioning.",
 };
 
 export default function RootLayout({
@@ -17,9 +12,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="en">
       <body className="antialiased">
-        <TooltipProvider>{children}</TooltipProvider>
+        {children}
       </body>
     </html>
   );
