@@ -7,9 +7,6 @@ export default function Home() {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
             Velo
           </Link>
           <nav className="flex items-center gap-6 text-sm text-muted-foreground">
@@ -22,19 +19,19 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="py-32 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-none">
-            Fast
+      <section className="flex flex-col justify-center items-start w-full h-screen min-h-[680px] px-[5%]">
+        <div>
+          <h1 className="text-[65px] md:text-[105px] font-bold uppercase leading-none tracking-tight">
+            FAST
           </h1>
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-none">
-            Smart
+          <h1 className="text-[65px] md:text-[105px] font-bold uppercase leading-none tracking-tight">
+            SMART
           </h1>
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-none">
-            Global
+          <h1 className="text-[65px] md:text-[105px] font-bold uppercase leading-none tracking-tight">
+            GLOBAL
           </h1>
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-none text-primary">
-            Velo&gt;API
+          <h1 className="text-[65px] md:text-[105px] font-bold uppercase leading-none tracking-tight">
+            <span className="text-muted-foreground">VELO&gt;</span>API
           </h1>
         </div>
       </section>
