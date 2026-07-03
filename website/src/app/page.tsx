@@ -13,6 +13,7 @@ export default function Home() {
             <a href="#docs" className="hover:text-foreground transition">Docs</a>
             <a href="#tests" className="hover:text-foreground transition">Tests</a>
             <a href="#compare" className="hover:text-foreground transition">Compare</a>
+            <Link href="/playground" className="hover:text-foreground transition">Playground</Link>
             <a href="https://github.com/MTconnect-BR/APIs" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition">
               GitHub
             </a>
