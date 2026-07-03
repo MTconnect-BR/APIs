@@ -1,3 +1,12 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 export function ComparisonTable() {
   const features = [
     { feature: "Rate Limiting", traditional: false, velo: true },
@@ -13,37 +22,35 @@ export function ComparisonTable() {
   ];
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b border-[#262626]">
-            <th className="text-left py-4 px-6 text-[#737373] font-medium">Feature</th>
-            <th className="text-left py-4 px-6 text-[#737373] font-medium">Tradicional</th>
-            <th className="text-left py-4 px-6 text-[#00DC82] font-medium">Velo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {features.map((row, i) => (
-            <tr key={i} className="border-b border-[#262626] hover:bg-[#00DC82]/5">
-              <td className="py-4 px-6 font-medium">{row.feature}</td>
-              <td className="py-4 px-6 text-[#737373]">
-                {typeof row.traditional === "boolean" ? (
-                  row.traditional ? "✅" : "❌"
-                ) : (
-                  row.traditional
-                )}
-              </td>
-              <td className="py-4 px-6 text-[#00DC82]">
-                {typeof row.velo === "boolean" ? (
-                  row.velo ? "✅" : "❌"
-                ) : (
-                  row.velo
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Feature</TableHead>
+          <TableHead>Tradicional</TableHead>
+          <TableHead className="text-primary">Velo</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {features.map((row, i) => (
+          <TableRow key={i}>
+            <TableCell className="font-medium">{row.feature}</TableCell>
+            <TableCell className="text-muted-foreground">
+              {typeof row.traditional === "boolean" ? (
+                row.traditional ? "✅" : "❌"
+              ) : (
+                row.traditional
+              )}
+            </TableCell>
+            <TableCell className="text-primary">
+              {typeof row.velo === "boolean" ? (
+                row.velo ? "✅" : "❌"
+              ) : (
+                row.velo
+              )}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

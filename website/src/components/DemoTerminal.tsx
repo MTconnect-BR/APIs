@@ -1,3 +1,5 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 interface DemoTerminalProps {
   title: string;
   description: string;
@@ -6,21 +8,23 @@ interface DemoTerminalProps {
 
 export function DemoTerminal({ title, description, code }: DemoTerminalProps) {
   return (
-    <div className="rounded-xl overflow-hidden border border-[#262626]">
-      <div className="flex items-center gap-2 px-4 py-3 bg-[#141414] border-b border-[#262626]">
-        <div className="flex gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-          <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-          <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <div className="flex gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <div className="w-3 h-3 rounded-full bg-green-500" />
+          </div>
+          <CardTitle className="text-sm font-medium ml-2">{title}</CardTitle>
         </div>
-        <span className="text-sm text-[#737373] ml-2">{title}</span>
-      </div>
-      <div className="p-4 bg-[#0A0A0A]">
-        <p className="text-sm text-[#737373] mb-4">{description}</p>
-        <pre className="text-sm overflow-x-auto text-[#FAFAFA]">
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground mb-4">{description}</p>
+        <pre className="text-sm overflow-x-auto">
           {code}
         </pre>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DemoTerminal } from "@/components/DemoTerminal";
 
 export default function DemoPage() {
@@ -5,7 +6,7 @@ export default function DemoPage() {
     <main className="min-h-screen py-24 px-6">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Demo interativo</h1>
-        <p className="text-[#737373] mb-12">
+        <p className="text-muted-foreground mb-12">
           Veja a diferença entre uma API tradicional e uma API com Velo.
         </p>
 
@@ -48,29 +49,36 @@ auth:
       secret: "\${JWT_SECRET}"
 
 # Resultado:
-# ✅ Rate limiting automático
-# ✅ Cache Redis
-# ✅ JWT auth
-# ✅ Prometheus metrics`}
+// ✅ Rate limiting automático
+// ✅ Cache Redis
+// ✅ JWT auth
+// ✅ Prometheus metrics`}
           />
         </div>
 
         <div className="mt-16">
           <h2 className="text-2xl font-bold mb-6">Requisição vs Resposta</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-6 rounded-xl bg-[#141414] border border-[#262626]">
-              <h3 className="font-semibold mb-4 text-[#737373]">Request</h3>
-              <pre className="text-sm overflow-x-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-muted-foreground">Request</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <pre className="text-sm overflow-x-auto">
 {`GET /api/users HTTP/1.1
 Host: api.example.com
 Authorization: Bearer eyJhbG...
 X-API-Version: v1
 X-API-Key: velo_xxx`}
-              </pre>
-            </div>
-            <div className="p-6 rounded-xl bg-[#141414] border border-[#262626]">
-              <h3 className="font-semibold mb-4 text-[#00DC82]">Response</h3>
-              <pre className="text-sm overflow-x-auto">
+                </pre>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-primary">Response</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <pre className="text-sm overflow-x-auto">
 {`HTTP/1.1 200 OK
 Content-Type: application/json
 X-Cache: HIT
@@ -84,8 +92,9 @@ X-API-Version: v1
     "latency": "12ms"
   }
 }`}
-              </pre>
-            </div>
+                </pre>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

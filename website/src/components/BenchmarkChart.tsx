@@ -1,5 +1,8 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+
 export function BenchmarkChart() {
   const metrics = [
     { label: "Latência", traditional: 45, velo: 12, unit: "ms", improvement: "73%" },
@@ -11,38 +14,28 @@ export function BenchmarkChart() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {metrics.map((m, i) => (
-        <div key={i} className="p-6 rounded-xl bg-[#0A0A0A] border border-[#262626]">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold">{m.label}</h3>
-            <span className="text-[#00DC82] text-sm font-medium">-{m.improvement}</span>
-          </div>
-          <div className="space-y-3">
+        <Card key={i}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">{m.label}</CardTitle>
+            <span className="text-primary text-sm font-medium">-{m.improvement}</span>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-[#737373]">Tradicional</span>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Tradicional</span>
                 <span>{m.traditional} {m.unit}</span>
               </div>
-              <div className="h-2 bg-[#262626] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#737373] rounded-full"
-                  style={{ width: "100%" }}
-                />
-              </div>
+              <Progress value={100} className="h-2" />
             </div>
             <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-[#737373]">Velo</span>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Velo</span>
                 <span>{m.velo} {m.unit}</span>
               </div>
-              <div className="h-2 bg-[#262626] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#00DC82] rounded-full"
-                  style={{ width: `${(m.velo / m.traditional) * 100}%` }}
-                />
-              </div>
+              <Progress value={(m.velo / m.traditional) * 100} className="h-2" />
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );
