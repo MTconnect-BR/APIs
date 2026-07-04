@@ -1,6 +1,15 @@
 # Velo API Gateway
 
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/MTconnect-BR/APIs)
+
 High-performance API gateway for modern applications. Solve the 7 problems every API faces: rate limiting, cache, authentication, load balancing, observability, documentation, and versioning.
+
+## Live Demo
+
+- **Website:** [https://website-ten-gold-16.vercel.app](https://website-ten-gold-16.vercel.app)
+- **Gateway API:** [https://velo-api-production.up.railway.app](https://velo-api-production.up.railway.app)
+- **Playground:** [https://website-ten-gold-16.vercel.app/playground](https://website-ten-gold-16.vercel.app/playground)
+- **Docs (PT-BR):** [https://website-ten-gold-16.vercel.app/docs](https://website-ten-gold-16.vercel.app/docs)
 
 ## Features
 
@@ -107,6 +116,8 @@ docker-compose up -d
 ## Website
 
 The comparison website is built with Next.js and deployed to Vercel.
+
+**Live:** [https://website-ten-gold-16.vercel.app](https://website-ten-gold-16.vercel.app)
 
 ```bash
 cd website
