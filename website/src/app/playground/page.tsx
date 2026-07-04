@@ -47,7 +47,7 @@ export default function Playground() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const TRADITIONAL_API = "https://jsonplaceholder.typicode.com";
-  const VELO_API = process.env.NEXT_PUBLICVELO_API_URL || "https://velo-api.up.railway.app";
+  const VELO_API = process.env.NEXT_PUBLIC_VELO_API_URL || "https://velo-api-production.up.railway.app";
 
   const simulateRequest = async (
     method: string,

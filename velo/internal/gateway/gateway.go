@@ -60,6 +60,7 @@ func New(cfg *config.Config) (*Gateway, error) {
 	gw.docsGen = docs.New(cfg.Docs)
 
 	gw.middleware = middleware.NewChain(
+		gw.corsMiddleware,
 		gw.loggingMiddleware,
 		gw.metricsMiddleware,
 		gw.rateLimitMiddleware,
@@ -177,6 +178,22 @@ func (gw *Gateway) versionMiddleware(next http.Handler) http.Handler {
 		if gw.versioning != nil {
 			gw.versioning.Process(r)
 		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (gw *Gateway) corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-API-Version, X-Request-ID")
+		w.Header().Set("Access-Control-Max-Age", "86400")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }
