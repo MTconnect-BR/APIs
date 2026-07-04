@@ -1,14 +1,20 @@
 package gateway
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/velo-api/velo/internal/api"
 	"github.com/velo-api/velo/internal/auth"
+	"github.com/velo-api/velo/internal/batch"
 	"github.com/velo-api/velo/internal/cache"
 	"github.com/velo-api/velo/internal/docs"
 	"github.com/velo-api/velo/internal/loadbalance"
@@ -32,7 +38,9 @@ type Gateway struct {
 	docsGen     *docs.DocsGenerator
 	storage     *storage.Engine
 	apiHandlers *api.API
+	batchEngine *batch.BatchEngine
 	middleware  *middleware.Chain
+	server      *http.Server
 }
 
 func New(cfg *config.Config) (*Gateway, error) {
@@ -67,7 +75,7 @@ func New(cfg *config.Config) (*Gateway, error) {
 			storePath = "./data/velo.db"
 		}
 
-		log.Printf("📦 Opening storage at %s...", storePath)
+		log.Printf("Opening storage at %s...", storePath)
 		store, err := storage.NewEngine(storePath)
 		if err != nil {
 			return nil, fmt.Errorf("failed to open storage: %w", err)
@@ -79,11 +87,27 @@ func New(cfg *config.Config) (*Gateway, error) {
 		}
 
 		gw.apiHandlers = api.New(store)
-		log.Println("✅ Storage engine ready")
+
+		if cfg.Auth.Enabled && len(cfg.Auth.Providers) > 0 {
+			for _, p := range cfg.Auth.Providers {
+				if p.Type == "jwt" {
+					gw.apiHandlers.SetAuth(gw.auth, p.Secret)
+					break
+				}
+			}
+		}
+
+		log.Println("Storage engine ready")
 	}
 
 	gw.versioning = version.New(cfg.Versioning)
 	gw.docsGen = docs.New(cfg.Docs)
+
+	if cfg.Batch.Enabled {
+		processor := batch.NewDefaultProcessor(gw)
+		gw.batchEngine = batch.NewBatchEngine(cfg.Batch, processor)
+		gw.batchEngine.Start()
+	}
 
 	gw.middleware = middleware.NewChain(
 		gw.corsMiddleware,
@@ -92,6 +116,7 @@ func New(cfg *config.Config) (*Gateway, error) {
 		gw.rateLimitMiddleware,
 		gw.authMiddleware,
 		gw.cacheMiddleware,
+		gw.batchMiddleware,
 		gw.versionMiddleware,
 	)
 
@@ -102,6 +127,7 @@ func (gw *Gateway) Start() error {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/metrics", gw.handleMetrics)
+	mux.HandleFunc("/batch/metrics", gw.handleBatchMetrics)
 	mux.HandleFunc(gw.config.Docs.Path, gw.handleDocs)
 	mux.HandleFunc("/health", gw.handleHealth)
 
@@ -120,7 +146,7 @@ func (gw *Gateway) Start() error {
 
 	handler := gw.middleware.Then(mux)
 
-	server := &http.Server{
+	gw.server = &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", gw.config.Server.Host, gw.config.Server.Port),
 		Handler:      handler,
 		ReadTimeout:  15 * time.Second,
@@ -128,8 +154,10 @@ func (gw *Gateway) Start() error {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Printf("🚀 Velo API Gateway running on %s", server.Addr)
-	log.Printf("📊 API Endpoints:")
+	go gw.gracefulShutdown()
+
+	log.Printf("Velo API Gateway running on %s", gw.server.Addr)
+	log.Printf("API Endpoints:")
 	log.Printf("   GET    /api/v1/users")
 	log.Printf("   GET    /api/v1/users/:id")
 	log.Printf("   POST   /api/v1/users")
@@ -145,9 +173,80 @@ func (gw *Gateway) Start() error {
 	log.Printf("   POST   /api/v1/auth/register")
 	log.Printf("   GET    /health")
 	log.Printf("   GET    /metrics")
+	log.Printf("   GET    /batch/metrics")
 	log.Printf("   GET    %s", gw.config.Docs.Path)
 
-	return server.ListenAndServe()
+	if gw.batchEngine != nil {
+		log.Printf("   Batch Engine: ENABLED (window: %v)", gw.config.Batch.Window)
+	}
+
+	return gw.server.ListenAndServe()
+}
+
+func (gw *Gateway) gracefulShutdown() {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if gw.batchEngine != nil {
+		gw.batchEngine.Stop()
+	}
+
+	if err := gw.server.Shutdown(ctx); err != nil {
+		log.Printf("Server forced to shutdown: %v", err)
+	}
+
+	if gw.storage != nil {
+		gw.storage.Close()
+	}
+
+	log.Println("Server exited")
+}
+
+func (gw *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+
+	if strings.HasPrefix(path, "/api/v1/auth/") {
+		switch {
+		case strings.HasSuffix(path, "/login"):
+			gw.apiHandlers.Login(w, r)
+		case strings.HasSuffix(path, "/register"):
+			gw.apiHandlers.Register(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+		return
+	}
+
+	if strings.HasPrefix(path, "/api/v1/users") {
+		if path == "/api/v1/users" {
+			gw.apiHandlers.Users(w, r)
+		} else {
+			gw.apiHandlers.UserByID(w, r)
+		}
+		return
+	}
+
+	if strings.HasPrefix(path, "/api/v1/posts") {
+		if path == "/api/v1/posts" {
+			gw.apiHandlers.Posts(w, r)
+		} else {
+			gw.apiHandlers.PostsByID(w, r)
+		}
+		return
+	}
+
+	if strings.HasPrefix(path, "/api/v1/comments") {
+		gw.apiHandlers.Comments(w, r)
+		return
+	}
+
+	http.NotFound(w, r)
 }
 
 func (gw *Gateway) handleHealth(w http.ResponseWriter, r *http.Request) {
@@ -162,7 +261,7 @@ func (gw *Gateway) handleHealth(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, `{"status":"ok","time":%d}`, time.Now().Unix())
+	json.NewEncoder(w).Encode(stats)
 }
 
 func (gw *Gateway) handleAPIRequest(w http.ResponseWriter, r *http.Request) {
@@ -223,6 +322,17 @@ func (gw *Gateway) handleMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNotFound)
+}
+
+func (gw *Gateway) handleBatchMetrics(w http.ResponseWriter, r *http.Request) {
+	if gw.batchEngine == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	metrics := gw.batchEngine.GetMetrics()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(metrics)
 }
 
 func (gw *Gateway) handleDocs(w http.ResponseWriter, r *http.Request) {
@@ -316,6 +426,27 @@ func (gw *Gateway) cacheMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func (gw *Gateway) batchMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if gw.batchEngine != nil && batch.IsBatchable(r) {
+			resultCh := gw.batchEngine.Submit(r)
+			result := <-resultCh
+
+			for key, values := range result.Headers {
+				for _, value := range values {
+					w.Header().Add(key, value)
+				}
+			}
+
+			w.WriteHeader(result.StatusCode)
+			w.Write(result.Body)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (gw *Gateway) versionMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if gw.versioning != nil {
@@ -327,7 +458,26 @@ func (gw *Gateway) versionMiddleware(next http.Handler) http.Handler {
 
 func (gw *Gateway) corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		origin := r.Header.Get("Origin")
+		allowedOrigins := gw.config.Server.AllowedOrigins
+
+		allowed := false
+		for _, o := range allowedOrigins {
+			if o == "*" || o == origin {
+				allowed = true
+				break
+			}
+		}
+
+		if allowed {
+			if len(allowedOrigins) == 1 && allowedOrigins[0] == "*" {
+				w.Header().Set("Access-Control-Allow-Origin", "*")
+			} else {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Vary", "Origin")
+			}
+		}
+
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-API-Version, X-Request-ID")
 		w.Header().Set("Access-Control-Max-Age", "86400")
@@ -339,4 +489,8 @@ func (gw *Gateway) corsMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func (gw *Gateway) GetBatchEngine() *batch.BatchEngine {
+	return gw.batchEngine
 }

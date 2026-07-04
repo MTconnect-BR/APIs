@@ -8,9 +8,10 @@ import (
 )
 
 type Cache struct {
-	config config.CacheConfig
-	items  map[string]*CacheItem
-	mu     sync.RWMutex
+	config  config.CacheConfig
+	items   map[string]*CacheItem
+	maxSize int
+	mu      sync.RWMutex
 }
 
 type CacheItem struct {
@@ -19,9 +20,11 @@ type CacheItem struct {
 }
 
 func New(cfg config.CacheConfig) *Cache {
+	maxSize := 10000
 	c := &Cache{
-		config: cfg,
-		items:  make(map[string]*CacheItem),
+		config:  cfg,
+		items:   make(map[string]*CacheItem),
+		maxSize: maxSize,
 	}
 
 	go c.cleanupLoop()
@@ -45,6 +48,10 @@ func (c *Cache) Set(key string, value []byte, ttl time.Duration) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if len(c.items) >= c.maxSize {
+		c.evictOldest()
+	}
+
 	c.items[key] = &CacheItem{
 		Value:     value,
 		ExpiresAt: time.Now().Add(ttl),
@@ -56,6 +63,22 @@ func (c *Cache) Delete(key string) {
 	defer c.mu.Unlock()
 
 	delete(c.items, key)
+}
+
+func (c *Cache) evictOldest() {
+	var oldestKey string
+	var oldestTime time.Time
+
+	for key, item := range c.items {
+		if oldestKey == "" || item.ExpiresAt.Before(oldestTime) {
+			oldestKey = key
+			oldestTime = item.ExpiresAt
+		}
+	}
+
+	if oldestKey != "" {
+		delete(c.items, oldestKey)
+	}
 }
 
 func (c *Cache) cleanupLoop() {

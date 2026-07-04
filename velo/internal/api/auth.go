@@ -1,28 +1,12 @@
 package api
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"net/http"
-	"strings"
-	"time"
 
+	"github.com/velo-api/velo/internal/auth"
 	"github.com/velo-api/velo/internal/storage"
 )
-
-var sessions = make(map[string]Session)
-
-type Session struct {
-	UserID    string
-	ExpiresAt time.Time
-}
-
-func generateToken() string {
-	b := make([]byte, 32)
-	rand.Read(b)
-	return hex.EncodeToString(b)
-}
 
 func (a *API) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -47,15 +31,19 @@ func (a *API) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.Password != req.Password {
+	if !storage.CheckPassword(user.Password, req.Password) {
 		respondError(w, http.StatusUnauthorized, "invalid credentials")
 		return
 	}
 
-	token := generateToken()
-	sessions[token] = Session{
-		UserID:    user.ID,
-		ExpiresAt: time.Now().Add(24 * time.Hour),
+	a.mu.RLock()
+	secret := a.jwtSecret
+	a.mu.RUnlock()
+
+	token, err := a.authService.GenerateToken(user.ID, user.Email, secret)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "failed to generate token")
+		return
 	}
 
 	respondSuccess(w, map[string]interface{}{
@@ -87,23 +75,33 @@ func (a *API) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	hashedPassword, err := storage.HashPassword(req.Password)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "failed to hash password")
+		return
+	}
+
 	id := a.storage.NextID("user:")
 	user := &storage.User{
 		ID:       id,
 		Name:     req.Name,
 		Email:    req.Email,
-		Password: req.Password,
+		Password: hashedPassword,
 	}
 
 	if err := a.storage.CreateUser(user); err != nil {
-		respondError(w, http.StatusInternalServerError, err.Error())
+		respondError(w, http.StatusInternalServerError, internalError(err, "create user"))
 		return
 	}
 
-	token := generateToken()
-	sessions[token] = Session{
-		UserID:    user.ID,
-		ExpiresAt: time.Now().Add(24 * time.Hour),
+	a.mu.RLock()
+	secret := a.jwtSecret
+	a.mu.RUnlock()
+
+	token, err := a.authService.GenerateToken(user.ID, user.Email, secret)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "failed to generate token")
+		return
 	}
 
 	respondCreated(w, map[string]interface{}{
@@ -113,17 +111,14 @@ func (a *API) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) ValidateToken(token string) bool {
-	session, exists := sessions[token]
-	if !exists {
-		return false
-	}
-	return time.Now().Before(session.ExpiresAt)
+	a.mu.RLock()
+	secret := a.jwtSecret
+	a.mu.RUnlock()
+
+	_, err := a.authService.ValidateToken(token, secret)
+	return err == nil
 }
 
 func ExtractToken(r *http.Request) string {
-	auth := r.Header.Get("Authorization")
-	if strings.HasPrefix(auth, "Bearer ") {
-		return strings.TrimPrefix(auth, "Bearer ")
-	}
-	return ""
+	return auth.ExtractToken(r)
 }

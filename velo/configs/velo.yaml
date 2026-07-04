@@ -1,6 +1,8 @@
 server:
   host: 0.0.0.0
   port: 8080
+  allowedOrigins:
+    - "*"
 
 storage:
   enabled: true
@@ -37,9 +39,17 @@ docs:
   enabled: true
   path: /docs
   title: "Velo API Gateway"
-  version: "1.0.0"
+  version: "2.0.0"
 
 versioning:
   strategy: header
   header: "X-API-Version"
   default: "v1"
+
+batch:
+  enabled: true
+  window: "5ms"
+  maxBatchSize: 100
+  flushInterval: "10ms"
+  classifiers:
+    - endpoint

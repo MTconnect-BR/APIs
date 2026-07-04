@@ -2,18 +2,31 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
+	"sync"
 
+	"github.com/velo-api/velo/internal/auth"
 	"github.com/velo-api/velo/internal/storage"
 )
 
 type API struct {
-	storage *storage.Engine
+	storage     *storage.Engine
+	authService *auth.Auth
+	jwtSecret   string
+	mu          sync.RWMutex
 }
 
 func New(store *storage.Engine) *API {
 	return &API{storage: store}
+}
+
+func (a *API) SetAuth(authService *auth.Auth, jwtSecret string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.authService = authService
+	a.jwtSecret = jwtSecret
 }
 
 type ErrorResponse struct {
@@ -26,6 +39,12 @@ type SuccessResponse struct {
 	Message string      `json:"message,omitempty"`
 }
 
+type PaginatedResponse struct {
+	Data  interface{} `json:"data"`
+	Total int         `json:"total,omitempty"`
+	Page  int         `json:"page,omitempty"`
+}
+
 func respondJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -34,6 +53,11 @@ func respondJSON(w http.ResponseWriter, status int, data interface{}) {
 
 func respondError(w http.ResponseWriter, status int, message string) {
 	respondJSON(w, status, ErrorResponse{Error: message, Code: status})
+}
+
+func internalError(err error, msg string) string {
+	log.Printf("[ERROR] %s: %v", msg, err)
+	return "internal server error"
 }
 
 func respondSuccess(w http.ResponseWriter, data interface{}) {

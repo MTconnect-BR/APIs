@@ -31,6 +31,7 @@ type LogEntry struct {
 	Path      string        `json:"path"`
 	Latency   time.Duration `json:"latency"`
 	Status    int           `json:"status"`
+	RequestID string        `json:"requestId,omitempty"`
 }
 
 func New(cfg config.ObserveConfig) *Observer {

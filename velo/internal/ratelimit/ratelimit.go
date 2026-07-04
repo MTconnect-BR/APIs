@@ -2,6 +2,8 @@ package ratelimit
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -29,8 +31,35 @@ func New(cfg config.RateLimitConfig) *RateLimiter {
 	}
 
 	go rl.refillLoop()
+	go rl.cleanupLoop()
 
 	return rl
+}
+
+func (rl *RateLimiter) parseRate(rate string) (float64, float64) {
+	parts := strings.SplitN(rate, "/", 2)
+	if len(parts) != 2 {
+		return 100, 100.0 / 60.0
+	}
+
+	tokens, err := strconv.ParseFloat(parts[0], 64)
+	if err != nil {
+		tokens = 100
+	}
+
+	var refillRate float64
+	switch parts[1] {
+	case "s", "sec", "second":
+		refillRate = tokens
+	case "m", "min", "minute":
+		refillRate = tokens / 60.0
+	case "h", "hr", "hour":
+		refillRate = tokens / 3600.0
+	default:
+		refillRate = tokens / 60.0
+	}
+
+	return tokens, refillRate
 }
 
 func (rl *RateLimiter) Allow(r *http.Request) bool {
@@ -58,10 +87,12 @@ func (rl *RateLimiter) getBucket(key string) *TokenBucket {
 		return bucket
 	}
 
+	maxTokens, refillRate := rl.parseRate(rl.config.Default)
+
 	bucket := &TokenBucket{
-		tokens:     100,
-		maxTokens:  100,
-		refillRate: 100.0 / 60.0,
+		tokens:     maxTokens,
+		maxTokens:  maxTokens,
+		refillRate: refillRate,
 		lastRefill: time.Now(),
 	}
 	rl.buckets[key] = bucket
@@ -95,6 +126,22 @@ func (rl *RateLimiter) refillLoop() {
 		rl.mu.Lock()
 		for _, bucket := range rl.buckets {
 			bucket.refill()
+		}
+		rl.mu.Unlock()
+	}
+}
+
+func (rl *RateLimiter) cleanupLoop() {
+	ticker := time.NewTicker(5 * time.Minute)
+	for range ticker.C {
+		rl.mu.Lock()
+		now := time.Now()
+		for key, bucket := range rl.buckets {
+			bucket.mu.Lock()
+			if now.Sub(bucket.lastRefill) > 10*time.Minute {
+				delete(rl.buckets, key)
+			}
+			bucket.mu.Unlock()
 		}
 		rl.mu.Unlock()
 	}

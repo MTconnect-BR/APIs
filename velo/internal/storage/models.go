@@ -1,23 +1,27 @@
 package storage
 
-import "time"
+import (
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type User struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
 	Email     string `json:"email"`
-	Password  string `json:"password"`
+	Password  string `json:"-"`
 	Avatar    string `json:"avatar"`
 	CreatedAt int64  `json:"createdAt"`
 }
 
 type Post struct {
-	ID        string `json:"id"`
-	UserID    string `json:"userId"`
-	Title     string `json:"title"`
-	Body      string `json:"body"`
+	ID        string   `json:"id"`
+	UserID    string   `json:"userId"`
+	Title     string   `json:"title"`
+	Body      string   `json:"body"`
 	Tags      []string `json:"tags,omitempty"`
-	CreatedAt int64  `json:"createdAt"`
+	CreatedAt int64    `json:"createdAt"`
 }
 
 type Comment struct {
@@ -43,6 +47,16 @@ type RegisterRequest struct {
 type AuthResponse struct {
 	Token string `json:"token"`
 	User  User   `json:"user"`
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
+}
+
+func CheckPassword(hashedPassword, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	return err == nil
 }
 
 func NewUser(id, name, email, password string) *User {

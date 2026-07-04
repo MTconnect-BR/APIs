@@ -50,7 +50,7 @@ func (a *API) createComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := a.storage.CreateComment(comment); err != nil {
-		respondError(w, http.StatusInternalServerError, err.Error())
+		respondError(w, http.StatusInternalServerError, internalError(err, "create comment"))
 		return
 	}
 

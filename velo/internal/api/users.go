@@ -88,16 +88,22 @@ func (a *API) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	hashedPassword, err := storage.HashPassword(req.Password)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "failed to hash password")
+		return
+	}
+
 	id := a.storage.NextID("user:")
 	user := &storage.User{
 		ID:       id,
 		Name:     req.Name,
 		Email:    req.Email,
-		Password: req.Password,
+		Password: hashedPassword,
 	}
 
 	if err := a.storage.CreateUser(user); err != nil {
-		respondError(w, http.StatusInternalServerError, err.Error())
+		respondError(w, http.StatusInternalServerError, internalError(err, "create user"))
 		return
 	}
 
@@ -123,9 +129,17 @@ func (a *API) updateUser(w http.ResponseWriter, r *http.Request, id string) {
 	if email, ok := updates["email"]; ok && email != "" {
 		existing.Email = email
 	}
+	if password, ok := updates["password"]; ok && password != "" {
+		hashedPassword, err := storage.HashPassword(password)
+		if err != nil {
+			respondError(w, http.StatusInternalServerError, "failed to hash password")
+			return
+		}
+		existing.Password = hashedPassword
+	}
 
 	if err := a.storage.UpdateUser(id, existing); err != nil {
-		respondError(w, http.StatusInternalServerError, err.Error())
+		respondError(w, http.StatusInternalServerError, internalError(err, "update user"))
 		return
 	}
 

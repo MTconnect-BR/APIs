@@ -3,10 +3,10 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/dgraph-io/badger/v3"
+	"github.com/velo-api/velo/pkg/utils"
 )
 
 const (
@@ -242,8 +242,7 @@ func (e *Engine) DeletePost(id string) error {
 }
 
 func (e *Engine) NextID(prefix string) string {
-	count, _ := e.count(prefix)
-	return strconv.Itoa(count + 1)
+	return utils.GeneratePrefixedID(prefix[:len(prefix)-1])
 }
 
 // Comments

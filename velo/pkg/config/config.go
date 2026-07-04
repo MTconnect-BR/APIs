@@ -17,6 +17,7 @@ type Config struct {
 	Observe      ObserveConfig      `yaml:"observe"`
 	Docs         DocsConfig         `yaml:"docs"`
 	Versioning   VersioningConfig   `yaml:"versioning"`
+	Batch        BatchConfig        `yaml:"batch"`
 }
 
 type StorageConfig struct {
@@ -26,8 +27,9 @@ type StorageConfig struct {
 }
 
 type ServerConfig struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	Host           string   `yaml:"host"`
+	Port           int      `yaml:"port"`
+	AllowedOrigins []string `yaml:"allowedOrigins"`
 }
 
 type RateLimitConfig struct {
@@ -110,6 +112,14 @@ type VersioningConfig struct {
 	Default  string `yaml:"default"`
 }
 
+type BatchConfig struct {
+	Enabled       bool     `yaml:"enabled"`
+	Window        string   `yaml:"window"`
+	MaxBatchSize  int      `yaml:"maxBatchSize"`
+	FlushInterval string   `yaml:"flushInterval"`
+	Classifiers   []string `yaml:"classifiers"`
+}
+
 func Load(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -118,8 +128,9 @@ func Load(path string) (*Config, error) {
 
 	cfg := &Config{
 		Server: ServerConfig{
-			Host: "0.0.0.0",
-			Port: 8080,
+			Host:           "0.0.0.0",
+			Port:           8080,
+			AllowedOrigins: []string{"*"},
 		},
 		Storage: StorageConfig{
 			Enabled: true,
@@ -148,8 +159,9 @@ func Load(path string) (*Config, error) {
 				Path:    "/metrics",
 			},
 			Logs: LogsConfig{
-				Level:  "info",
-				Format: "json",
+				Enabled: true,
+				Level:   "info",
+				Format:  "json",
 			},
 		},
 		Docs: DocsConfig{
@@ -162,6 +174,13 @@ func Load(path string) (*Config, error) {
 			Strategy: "header",
 			Header:   "X-API-Version",
 			Default:  "v1",
+		},
+		Batch: BatchConfig{
+			Enabled:       true,
+			Window:        "5ms",
+			MaxBatchSize:  100,
+			FlushInterval: "10ms",
+			Classifiers:   []string{"endpoint"},
 		},
 	}
 

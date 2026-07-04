@@ -1,12 +1,15 @@
 package utils
 
 import (
-	"crypto/rand"
-	"encoding/hex"
+	"fmt"
+
+	"github.com/google/uuid"
 )
 
 func GenerateID() string {
-	bytes := make([]byte, 16)
-	rand.Read(bytes)
-	return hex.EncodeToString(bytes)
+	return uuid.New().String()
+}
+
+func GeneratePrefixedID(prefix string) string {
+	return fmt.Sprintf("%s_%s", prefix, uuid.New().String()[:8])
 }

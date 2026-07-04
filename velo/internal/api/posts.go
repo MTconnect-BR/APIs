@@ -109,7 +109,7 @@ func (a *API) createPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := a.storage.CreatePost(post); err != nil {
-		respondError(w, http.StatusInternalServerError, err.Error())
+		respondError(w, http.StatusInternalServerError, internalError(err, "create post"))
 		return
 	}
 
@@ -124,7 +124,7 @@ func (a *API) deletePost(w http.ResponseWriter, r *http.Request, id string) {
 	}
 
 	if err := a.storage.DeletePost(id); err != nil {
-		respondError(w, http.StatusInternalServerError, err.Error())
+		respondError(w, http.StatusInternalServerError, internalError(err, "delete post"))
 		return
 	}
 

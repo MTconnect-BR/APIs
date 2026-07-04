@@ -20,7 +20,7 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	fmt.Printf("🚀 Velo API Gateway starting on %s:%d\n", cfg.Server.Host, cfg.Server.Port)
+	fmt.Printf("Velo API Gateway starting on %s:%d\n", cfg.Server.Host, cfg.Server.Port)
 
 	gw, err := gateway.New(cfg)
 	if err != nil {
