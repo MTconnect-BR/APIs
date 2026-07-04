@@ -9,12 +9,7 @@ storage:
 
 ratelimit:
   enabled: true
-  default: "1000/min"
-  rules:
-    - path: "/api/v1/*"
-      limit: "5000/min"
-    - path: "/api/v2/*"
-      limit: "2500/min"
+  default: "100/min"
 
 cache:
   enabled: true
@@ -32,6 +27,7 @@ observe:
     enabled: true
     path: /metrics
   logs:
+    enabled: true
     level: info
     format: json
   tracing:

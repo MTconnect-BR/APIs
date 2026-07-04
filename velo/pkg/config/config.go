@@ -9,6 +9,7 @@ import (
 
 type Config struct {
 	Server       ServerConfig       `yaml:"server"`
+	Storage      StorageConfig      `yaml:"storage"`
 	RateLimit    RateLimitConfig    `yaml:"ratelimit"`
 	Cache        CacheConfig        `yaml:"cache"`
 	Auth         AuthConfig         `yaml:"auth"`
@@ -16,6 +17,12 @@ type Config struct {
 	Observe      ObserveConfig      `yaml:"observe"`
 	Docs         DocsConfig         `yaml:"docs"`
 	Versioning   VersioningConfig   `yaml:"versioning"`
+}
+
+type StorageConfig struct {
+	Enabled bool   `yaml:"enabled"`
+	Path    string `yaml:"path"`
+	Seed    bool   `yaml:"seed"`
 }
 
 type ServerConfig struct {
@@ -113,6 +120,11 @@ func Load(path string) (*Config, error) {
 		Server: ServerConfig{
 			Host: "0.0.0.0",
 			Port: 8080,
+		},
+		Storage: StorageConfig{
+			Enabled: true,
+			Path:    "./data/velo.db",
+			Seed:    true,
 		},
 		RateLimit: RateLimitConfig{
 			Enabled: true,
